@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useRouter } from "next/router";
 import { Layout, Menu, theme } from 'antd';
 import { PieChartOutlined, UserOutlined, DesktopOutlined, TeamOutlined } from '@ant-design/icons';
 
@@ -7,6 +8,7 @@ import 'antd/dist/reset.css';
 
 export default function Home({ children }) {
 
+    const router = useRouter();
     const { Header, Content, Footer, Sider } = Layout;
 
     const [collapsed, setCollapsed] = useState(false);
@@ -22,15 +24,20 @@ export default function Home({ children }) {
     };
 
     const items = [
-        getItem('Users', '1', <PieChartOutlined />),
-        getItem('Jobs', '2', <DesktopOutlined />),
-        getItem('Campaigns', 'sub1', <UserOutlined />, [
-            getItem('Emails', '3'),
-            getItem('Email Status', '4'),
-            getItem('Logs', '5'),
+        getItem('Users', 'users', <PieChartOutlined />),
+        getItem('Jobs', 'jobs', <DesktopOutlined />),
+        getItem('Campaigns', 'campaigns', <UserOutlined />, [
+            getItem('Emails', 'campaign/emails'),
+            getItem('Email Status', 'campaign/status'),
+            getItem('Logs', 'campaign/logs'),
         ]),
-        getItem('Companies', 'sub2', <TeamOutlined />, [getItem('Contact', '6'), getItem('Group', '8')]),
+        getItem('Companies', 'companies', <TeamOutlined />),
     ];
+
+    const manuHandler = ({ key }) => {
+
+        (key === 'users') ? router.push(key) : console.log('Routes are not initialized yet');
+    };
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
@@ -39,11 +46,16 @@ export default function Home({ children }) {
                     float: 'left', width: '120px', height: '31px',
                     margin: '16px 24px 16px 24px', background: 'rgba(255, 255, 255, 0.3)'
                 }} />
-                <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
+                <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} onClick={manuHandler} />
             </Sider>
             <Layout>
                 <Header style={{ padding: 0, background: colorBgContainer }} />
-                <Content style={{ margin: '0 16px' }}>
+                <Content style={{
+                    margin: '24px 16px',
+                    padding: 24,
+                    minHeight: 280,
+                    background: colorBgContainer,
+                }}>
                     {children}
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>
