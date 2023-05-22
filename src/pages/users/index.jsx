@@ -1,7 +1,23 @@
 import Head from 'next/head';
-import { Space, Table, Tag, Breadcrumb, Typography } from 'antd';
+import prisma from "../../../lib/prisma";
+import { Space, Table, Breadcrumb, Typography } from 'antd';
 
-const index = () => {
+/**
+ * Fetch Data from server and pass this 
+ * into props
+ */
+export const getServerSideProps = async () => {
+
+    const users = await prisma.user.findMany({});
+    
+    return { 
+        props: { 
+            users: JSON.parse(JSON.stringify(users))
+        } 
+    };
+};
+
+const index = ({ users }) => {
 
     const { Title } = Typography;
 
@@ -13,68 +29,24 @@ const index = () => {
             render: (text) => <a>{text}</a>,
         },
         {
-            title: 'Age',
-            dataIndex: 'age',
-            key: 'age',
+            title: 'Email',
+            dataIndex: 'email',
+            key: 'email',
         },
         {
-            title: 'Address',
-            dataIndex: 'address',
-            key: 'address',
-        },
-        {
-            title: 'Tags',
-            key: 'tags',
-            dataIndex: 'tags',
-            render: (_, { tags }) => (
-                <>
-                    {tags.map((tag) => {
-                        let color = tag.length > 5 ? 'geekblue' : 'green';
-                        if (tag === 'loser') {
-                            color = 'volcano';
-                        }
-                        return (
-                            <Tag color={color} key={tag}>
-                                {tag.toUpperCase()}
-                            </Tag>
-                        );
-                    })}
-                </>
-            ),
+            title: 'Created Date',
+            dataIndex: 'createdAt',
+            key: 'createdAt',
         },
         {
             title: 'Action',
             key: 'action',
-            render: (_, record) => (
+            render: () => (
                 <Space size="middle">
-                    <a>Invite {record.name}</a>
+                    <a>View</a>
                     <a>Delete</a>
                 </Space>
             ),
-        },
-    ];
-
-    const data = [
-        {
-            key: '1',
-            name: 'John Brown',
-            age: 32,
-            address: 'New York No. 1 Lake Park',
-            tags: ['nice', 'developer'],
-        },
-        {
-            key: '2',
-            name: 'Jim Green',
-            age: 42,
-            address: 'London No. 1 Lake Park',
-            tags: ['loser'],
-        },
-        {
-            key: '3',
-            name: 'Joe Black',
-            age: 32,
-            address: 'Sydney No. 1 Lake Park',
-            tags: ['cool', 'teacher'],
         },
     ];
 
@@ -83,22 +55,11 @@ const index = () => {
             <Head>
                 <title>User Listing</title>
             </Head>
-            <Breadcrumb
-                style={{ margin: '16px 0' }}
-                items={[
-                    {
-                        title: 'Dashboard',
-                    },
-                    {
-                        title: 'User Listing',
-                    },
-                ]}
-            />
+            <Breadcrumb style={{ margin: '16px 0' }} items={[{ title: 'Dashboard' }, { title: 'User Listing' }]} />
             <div className="site-layout-background">
                 <Title>Users List</Title>
-                <Table columns={columns} dataSource={data} />
+                <Table columns={columns} dataSource={users} rowKey="id" />
             </div>
-
         </>
     );
 };
