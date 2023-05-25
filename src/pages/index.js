@@ -5,10 +5,7 @@ export default function Home() {
 
     return (
         <>
-            <Breadcrumb style={{ margin: '16px 0' }}>
-                <Breadcrumb.Item>User</Breadcrumb.Item>
-                <Breadcrumb.Item>Bill</Breadcrumb.Item>
-            </Breadcrumb>
+            <Breadcrumb style={{ margin: '16px 0' }} items={[{ title: 'Dashboard' }]} />
             <div style={{ padding: 24, minHeight: 360 }}>
                 Dashboard
             </div>
