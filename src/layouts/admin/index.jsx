@@ -15,7 +15,7 @@ export default function Home({ children }) {
         required: true,
         onUnauthenticated() {
             // The user is not authenticated, handle it here.
-            router.push('/login');
+            router.push('/auth/login');
         },
     });
 
