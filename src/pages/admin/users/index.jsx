@@ -1,6 +1,7 @@
 import Head from 'next/head';
-import prisma from "../../../../lib/prisma";
 import { Space, Table, Breadcrumb, Typography } from 'antd';
+
+import UserController from "@/server/controller/web/user.controller";
 
 /**
  * Fetch Data from server and pass this 
@@ -8,11 +9,11 @@ import { Space, Table, Breadcrumb, Typography } from 'antd';
  */
 export const getServerSideProps = async () => {
 
-    const users = await prisma.user.findMany({});
-    
+    const { data } = await UserController.index();
+
     return { 
         props: { 
-            users: JSON.parse(JSON.stringify(users))
+            users: JSON.parse(JSON.stringify(data))
         } 
     };
 };
