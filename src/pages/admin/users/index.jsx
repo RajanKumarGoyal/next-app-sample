@@ -1,7 +1,10 @@
 import Head from 'next/head';
 import { Space, Table, Breadcrumb, Typography } from 'antd';
 
-import UserController from "@/server/controller/web/user.controller";
+/**
+ * Import Custom Files
+ */
+import Api from "@/helpers/Api.helper";
 
 /**
  * Fetch Data from server and pass this 
@@ -9,16 +12,16 @@ import UserController from "@/server/controller/web/user.controller";
  */
 export const getServerSideProps = async () => {
 
-    const { data } = await UserController.index();
+    const response = await Api.get('users');
 
     return { 
         props: { 
-            users: JSON.parse(JSON.stringify(data))
+            users: JSON.parse(JSON.stringify(response.data.data))
         } 
     };
 };
 
-const index = ({ users }) => {
+const Index = ({ users }) => {
 
     const { Title } = Typography;
 
@@ -65,4 +68,4 @@ const index = ({ users }) => {
     );
 };
 
-export default index;
+export default Index;

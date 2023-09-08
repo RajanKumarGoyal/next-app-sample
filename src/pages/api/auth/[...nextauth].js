@@ -1,4 +1,6 @@
+import bcrypt from 'bcrypt'; 
 import NextAuth from "next-auth";
+import prisma from "@/db.server";
 import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 
@@ -20,13 +22,22 @@ export const authOptions = {
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials, req) {
-                // return null;
-                if (credentials) {
-                    // Any object returned will be saved in `user` property of the JWT
-                    return credentials
+
+                const { email, password } = credentials;
+                const authUser = await prisma.user.findUnique({ where: { email: email } });
+    
+                if (authUser) {
+
+                    const checkAuthPassword = await bcrypt.compareSync(password, authUser.password);
+                    if (checkAuthPassword === false) {
+                        return null;
+                    }
+        
+                    return authUser;
+
                 } else {
-                    // If you return null then an error will be displayed advising the user to check their details.
-                    return null
+
+                    return null;
                 }
             }
         })

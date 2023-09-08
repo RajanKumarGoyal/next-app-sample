@@ -1,24 +1,48 @@
 import Head from 'next/head';
-import bcryptjs from 'bcryptjs';
-import { Input, Form, Breadcrumb, Typography, Button, Row, Col } from 'antd';
+import { useState } from 'react';
+import { useRouter } from 'next/router';
+import { Input, Form, Breadcrumb, Typography, Button, Row, Col, notification } from 'antd';
 
-import prisma from "@/server/lib/prisma";
+/**
+ * Import Custom Files
+ */
+import Api from "@/helpers/Api.helper";
 
-const index = () => {
+const Index = () => {
 
+    const router = useRouter();
     const { Title } = Typography;
+    const [isLoading, setIsLoading] = useState(false);
 
     const onSubmit = async (input) => {
 
-        const { password } = input;
+        setIsLoading(true);
+        Api.post("users", input).then((response) => {
 
-        input = {
-            ...input,
-            password: bcryptjs.hashSync(password, 10)
-        };
+            if ('status' in response.data && response.data.status === 200) {
+                setIsLoading(false);
+                notification.success({ 
+                    message: 'Create User', 
+                    description: 'User created successfully.' 
+                });
+                router.push('/admin/users');
 
-        const createdUser = await prisma.user.create({ data: input });
-        console.log('createdUser', createdUser);
+            } else {
+
+                setIsLoading(false);
+                notification.error({ 
+                    message: 'Create User', 
+                    description: 'Error occured! Please try again after some time.' 
+                });
+            }
+
+        }).catch((err) => {
+            setIsLoading(false);
+            notification.error({ 
+                message: 'Create User', 
+                description: err.message 
+            });
+        });
     };
 
     return (
@@ -48,7 +72,7 @@ const index = () => {
                             </Form.Item>
 
                             <Form.Item wrapperCol={{ offset: 8, span: 16 }} >
-                                <Button type="primary" htmlType="submit">Submit</Button>
+                                <Button loading={isLoading} type="primary" htmlType="submit">Submit</Button>
                             </Form.Item>
                         </Form>
                     </Col>
@@ -58,4 +82,4 @@ const index = () => {
     );
 };
 
-export default index;
+export default Index;
