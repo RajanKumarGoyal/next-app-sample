@@ -1,6 +1,7 @@
+import { useRouter } from 'next/router';
 import { getServerSession } from "next-auth/next";
 import { signIn, getProviders } from "next-auth/react";
-import { Button, Checkbox, Form, Input, Typography } from 'antd';
+import { Button, Checkbox, Form, Input, Typography, notification } from 'antd';
 
 import ClientLayout from "../../layouts/client/index";
 import { authOptions } from "../api/auth/[...nextauth]";
@@ -28,9 +29,26 @@ export async function getServerSideProps(context) {
 
 export default function SignIn({ providers }) {
 
+    const router = useRouter();
     const { Title } = Typography;
 
-    const onFinish = (values) => signIn("credentials", { ...values, callbackUrl: '/admin/users' });
+    const onFinish = (values) => {
+
+        /**
+         * Sign In by Next Auth
+         */
+        signIn("credentials", { ...values, redirect: false })
+            .then(({ ok, error }) => {
+                if (ok) {
+                    router.push("/admin/users");
+                } else {
+                    notification.error({
+                        message: 'User Login In',
+                        description: 'Email/Password Incorect, Please check!'
+                    });
+                }
+            })
+    };
 
     const btnHandler = (providerId) => signIn(providerId, { callbackUrl: '/admin/users' });
     
@@ -38,12 +56,6 @@ export default function SignIn({ providers }) {
         <div className="site-layout-background">
             <Title>Login</Title>
             <div className='login-form' style={{ margin: '16px 0' }}>
-
-                {/* {Object.values(providers).filter(({id}) => id !== 'credentials').map((provider) => (
-                    <div key={provider.name}>
-                        <Button onClick={() => btnHandler(provider.id)}>Sign in with {provider.name}</Button>
-                    </div>
-                ))} */}
 
                 <Form name="basic" labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} style={{ maxWidth: 600, }} initialValues={{ remember: true }}
                     onFinish={onFinish} autoComplete="off">
@@ -60,7 +72,15 @@ export default function SignIn({ providers }) {
                     </Form.Item>
 
                     <Form.Item wrapperCol={{ offset: 8, span: 16 }} >
+
                         <Button type="primary" htmlType="submit"> Submit </Button>
+
+                        {/* {Object.values(providers).filter(({ id }) => id !== 'credentials').map((provider) => (
+                            <div key={provider.name}>
+                                <Button onClick={() => btnHandler(provider.id)}>Sign in with {provider.name}</Button>
+                            </div>
+                        ))} */}
+
                     </Form.Item>
                 </Form>
             </div>
